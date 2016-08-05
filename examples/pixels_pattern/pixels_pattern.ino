@@ -1,8 +1,8 @@
 
 #include "SPI.h"
 #include "respeaker.h"
-#include "Streaming.h"
 #include <Adafruit_NeoPixel.h>
+// #include "Streaming.h"
 
 #define PIXELS_PIN      11
 #define PIXELS_NUM      12
@@ -26,7 +26,7 @@ void spi_event(uint8_t addr, uint8_t *data, uint8_t len)
     }
   }
   
-  Serial << "spi rx:" << (char*)data << " state: " << pixels_state << "\r\n";
+  // Serial << "spi rx:" << (char*)data << " state: " << pixels_state << "\r\n";
 }
 
 void setup() {
