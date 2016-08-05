@@ -2,14 +2,10 @@
 #include "respeaker.h"
 #include "SPI.h"
 
-ReSpeaker respeaker;
 
+ReSpeaker respeaker;
 const uint8_t ReSpeaker::touch_pins[TOUCH_NUM] = {6, 2, 4, 3, 8, 9, 13, 10};
 
-ReSpeaker::ReSpeaker()
-{
-    
-}
     
 void ReSpeaker::begin(int touch, int pixels, int spi)
 {
@@ -76,9 +72,9 @@ void ReSpeaker::handle_spi_data(uint8_t data)
     }
 }
 
-uint8_t ReSpeaker::detect_touch()
+uint16_t ReSpeaker::detect_touch()
 {
-    uint8_t status;
+    uint16_t status;
     for (uint8_t i = 0; i < TOUCH_NUM; i++) {
         uint8_t count = 0;
         touch_data[i] <<= 1;
@@ -102,16 +98,35 @@ uint8_t ReSpeaker::detect_touch()
             if (touch_isr) touch_isr(i, 0);
         }
     }
+    
+    return status;
+}
+
+uint16_t ReSpeaker::read_touch(uint8_t id)
+{
+    uint16_t count;
+
+    pinMode(touch_pins[id], INPUT);
+    while (!digitalRead(touch_pins[id])) {
+        count++;
+    }
+
+    pinMode(touch_pins[id], OUTPUT);
+    digitalWrite(touch_pins[id], LOW);
+    
+    return count;
 }
 
 void serialEventRun()
 {
-    while (Serial.available() && Serial1.availableForWrite()) {
-        Serial1.write((char)Serial.read());
-    }
+    if (respeaker.console) {
+        while (Serial.available() && Serial1.availableForWrite()) {
+            Serial1.write((char)Serial.read());
+        }
 
-    while (Serial1.available() && Serial.availableForWrite()) {
-        Serial.write((char)Serial1.read());
+        while (Serial1.available() && Serial.availableForWrite()) {
+            Serial.write((char)Serial1.read());
+        }
     }
     
     if (respeaker.touch_isr) {
