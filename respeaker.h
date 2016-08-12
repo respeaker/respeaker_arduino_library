@@ -82,7 +82,7 @@ public:
      *
      * @param enable    1 or 0
      */
-    void usb_to_serial(uint8_t enable=1) {
+    void set_console(uint8_t enable=1) {
         console = enable;
     }
     

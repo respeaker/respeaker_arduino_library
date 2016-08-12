@@ -120,11 +120,11 @@ uint16_t ReSpeaker::read_touch(uint8_t id)
 void serialEventRun()
 {
     if (respeaker.console) {
-        while (Serial.available() && Serial1.availableForWrite()) {
+        while (Serial.available()) {
             Serial1.write((char)Serial.read());
         }
 
-        while (Serial1.available() && Serial.availableForWrite()) {
+        while (Serial1.available()) {
             Serial.write((char)Serial1.read());
         }
     }
