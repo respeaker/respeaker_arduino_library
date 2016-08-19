@@ -15,7 +15,7 @@ void ReSpeaker::begin(int touch, int pixels, int spi)
     if (touch) {
         touch_data = new uint8_t[TOUCH_NUM];
         last_touch_detected = 0;
-        touch_isr = 0;
+        touch_handler = 0;
         touch_threshold = TOUCH_DEFAULT_THRESHOLD;
         
         for (uint8_t i = 0; i < TOUCH_NUM; i++) {
@@ -25,11 +25,16 @@ void ReSpeaker::begin(int touch, int pixels, int spi)
     } else {
         touch_data = 0;
     }
+
+    if (pixels) {
+        pixels_ptr = new Pixels(PIXELS_NUM);
+        pixels_ptr->begin(PIXELS_PIN);
+    }
     
     if (spi) {
         spi_buf = new uint8_t[SPI_BUF_SIZE];
         spi_buf_index = 0;
-        spi_isr_raw = 0;
+        spi_raw_handler = 0;
         
         pinMode(MOSI, INPUT);
         pinMode(MISO, OUTPUT);
@@ -64,7 +69,7 @@ void ReSpeaker::handle_spi_data(uint8_t data)
     
     if ('\n' == data) {
         spi_buf[spi_buf_index] = '\0';
-        if (spi_isr) spi_isr(0, spi_buf, spi_buf_index);
+        if (spi_handler) spi_handler(0, spi_buf, spi_buf_index);
         spi_buf_index = 0;
     } else {
         spi_buf[spi_buf_index] = data;
@@ -92,10 +97,10 @@ uint16_t ReSpeaker::detect_touch()
 
         if (0x01 == touch_data[i]) {
             status |= 1 << i;
-            if (touch_isr) touch_isr(i, 1);
+            if (touch_handler) touch_handler(i, 1);
         } else if (0x80 == touch_data[i]) {
             status &= ~(1 << i);
-            if (touch_isr) touch_isr(i, 0);
+            if (touch_handler) touch_handler(i, 0);
         }
     }
     
@@ -120,16 +125,16 @@ uint16_t ReSpeaker::read_touch(uint8_t id)
 void serialEventRun()
 {
     if (respeaker.console) {
-        while (Serial.available()) {
+        while (Serial.available() && Serial1.availableForWrite()) {
             Serial1.write((char)Serial.read());
         }
 
-        while (Serial1.available()) {
+        while (Serial1.available() && Serial1.availableForWrite()) {
             Serial.write((char)Serial1.read());
         }
     }
     
-    if (respeaker.touch_isr) {
+    if (respeaker.touch_handler) {
         uint32_t current = millis();
         if ((uint32_t)(current - respeaker.last_touch_detected) >= 50) {
             respeaker.last_touch_detected = current;
@@ -144,9 +149,9 @@ ISR (SPI_STC_vect)
 {
     uint8_t data = SPDR;  // read SPI Data Register
 
-    if (!respeaker.spi_isr_raw) {
+    if (!respeaker.spi_raw_handler) {
         respeaker.handle_spi_data(data);
     } else {
-        respeaker.spi_isr_raw(data);
+        respeaker.spi_raw_handler(data);
     }
 }

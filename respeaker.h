@@ -4,12 +4,14 @@
 #define __RESPEAKER_H__
 
 #include "Arduino.h"
+#include "pixels.h"
 
 #define SPI_BUF_SIZE            64
 #define TOUCH_NUM               8
 #define TOUCH_DETECT_INTERVAL   50 // ms
 #define TOUCH_DEFAULT_THRESHOLD 32
 #define PIXELS_NUM              12
+#define PIXELS_PIN              11
 
 class ReSpeaker
 {
@@ -21,9 +23,9 @@ public:
     /**
      * setup touch buttons, full color pixels and spi bridge
      *
-     * @param touch     1 - enable touch buttons, 0 - disabled
-     * @param pixels    1 - enable pixels, 0 - disabled
-     * @param spi       1 - enable spi bridge, 0 - disabled
+     * @param touch     1 - enable touch buttons, 0 - disable
+     * @param pixels    1 - enable pixels, 0 - disable
+     * @param spi       1 - enable spi bridge, 0 - disable
      */
     void begin(int touch=1, int pixels=1, int spi=1);
     
@@ -40,12 +42,6 @@ public:
      * @param cmd      command to be executed
      */
     void exec(const char *cmd);
-    
-    /**
-     *
-     *
-     */
-    void handle_spi_data(uint8_t data);
     
     /**
      * adjust touch threshold
@@ -80,7 +76,7 @@ public:
     /**
      * enable/disable usb to serial bridge
      *
-     * @param enable    1 or 0
+     * @param enable    0 - disable console, otherwise enable console
      */
     void set_console(uint8_t enable=1) {
         console = enable;
@@ -89,39 +85,62 @@ public:
     /**
      * attach an interrupt handler which will be called when a touch event happens
      *
-     * @param isr   interrupt handler
+     * @param handler   touch interrupt handler
      */
-    void attach_touch_isr(void (*isr)(uint8_t id, uint8_t event)) {
-        touch_isr = isr;
+    void attach_touch_handler(void (*handler)(uint8_t id, uint8_t event)) {
+        touch_handler = handler;
     }
     
     /**
      * attach an interrupt handler which will be called when a spi packet is received
      *
-     * @param isr   interrupt handler
+     * @param handler   spi interrupt handler
      */
-    void attach_spi_isr(void (*isr)(uint8_t addr, uint8_t *data, uint8_t len)) {
-        spi_isr = isr;
+    void attach_spi_handler(void (*handler)(uint8_t addr, uint8_t *data, uint8_t len)) {
+        spi_handler = handler;
     }
     
-    void attach_spi_isr_raw(void (*isr)(uint8_t data)) {
-        spi_isr_raw = isr;
+        
+    /**
+     * receive spi raw data, convert raw data into a packet with address and lenght
+     *
+     * @param data      spi received raw data
+     */
+    void handle_spi_data(uint8_t data);
+    
+    /**
+     * attach an interrupt handler which will be called when a single byte is received from spi
+     *
+     * @param handler   raw spi interrupt handler
+     */
+    void attach_spi_raw_handler(void (*handler)(uint8_t data)) {
+        spi_raw_handler = handler;
+    }
+
+    /**
+     * Get the Pixels reference of the 12 pixels on respeaker
+     * 
+     * @return  Pixels reference 
+     */
+    Pixels &pixels() {
+        return *pixels_ptr;
     }
     
 public:
-    void (*spi_isr_raw)(uint8_t data);
-    void (*touch_isr)(uint8_t id, uint8_t event);
+    void (*spi_raw_handler)(uint8_t data);
+    void (*touch_handler)(uint8_t id, uint8_t event);
     uint32_t last_touch_detected;
     uint8_t console;
     
 private:
+    Pixels *pixels_ptr;
     uint8_t spi_buf_index;
     uint8_t *spi_buf;
     uint8_t *touch_data;
     uint16_t touch_threshold;
     static const uint8_t touch_pins[TOUCH_NUM];
     
-    void (*spi_isr)(uint8_t addr, uint8_t *data, uint8_t len);
+    void (*spi_handler)(uint8_t addr, uint8_t *data, uint8_t len);
 };
 
 extern ReSpeaker respeaker;
