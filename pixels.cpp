@@ -205,19 +205,6 @@ void Pixels::theater_chase_rainbow(uint8_t time)
     }
 }
 
-uint32_t Pixels::wheel(uint8_t position) 
-{
-    if(position < 85) {
-        return RGB(position * 3, 255 - position * 3, 0);
-    } else if(position < 170) {
-        position -= 85;
-        return RGB(255 - position * 3, 0, position * 3);
-    } else {
-        position -= 170;
-        return RGB(0, position * 3, 255 - position * 3);
-    }
-}
-
 void Pixels::update() 
 {
     if(!pixels) return;

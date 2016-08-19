@@ -39,7 +39,18 @@ public:
 		return ((uint32_t)red << 16) | ((uint32_t)green << 8) | blue;
 	};
     
-    uint32_t wheel(uint8_t position);
+    static uint32_t wheel(uint8_t position) {
+        if(position < 85) {
+            return RGB(position * 3, 255 - position * 3, 0);
+        } else if(position < 170) {
+            position -= 85;
+            return RGB(255 - position * 3, 0, position * 3);
+        } else {
+            position -= 170;
+            return RGB(0, position * 3, 255 - position * 3);
+        }
+    }
+    
     void rainbow(uint8_t offset);
 
     void scroll(uint32_t px_value, uint8_t time);
