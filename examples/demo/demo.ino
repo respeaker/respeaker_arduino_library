@@ -9,7 +9,7 @@
 uint32_t t = 0;
 
 void touch_event(uint8_t id, uint8_t event) {
-
+    // id - touch sensor id (0 ~ 7), event - 1: touch, 0: release
 }
 
 void setup() {

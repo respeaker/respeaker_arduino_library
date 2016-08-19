@@ -14,7 +14,7 @@ int pixels_state = 0;
 const char *pixels_patterns[] = {"sleep", "wakeup", "wait", "answer", "offline", "online"};
 
 void touch_event(uint8_t id, uint8_t event) {
-
+    // id - touch sensor id (0 ~ 7), event - 1: touch, 0: release
 }
 
 void spi_event(uint8_t addr, uint8_t *data, uint8_t len)

@@ -4,7 +4,7 @@
 
 
 ReSpeaker respeaker;
-const uint8_t ReSpeaker::touch_pins[TOUCH_NUM] = {6, 2, 4, 3, 8, 9, 13, 10};
+const uint8_t ReSpeaker::touch_pins[TOUCH_NUM] = {8, 9, 13, 10, 6, 2, 4, 3};
 
     
 void ReSpeaker::begin(int touch, int pixels, int spi)
