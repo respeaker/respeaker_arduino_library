@@ -129,7 +129,7 @@ void serialEventRun()
             Serial1.write((char)Serial.read());
         }
 
-        while (Serial1.available() && Serial1.availableForWrite()) {
+        while (Serial1.available() && Serial.availableForWrite()) {
             Serial.write((char)Serial1.read());
         }
     }
