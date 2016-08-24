@@ -16,9 +16,7 @@
 class ReSpeaker
 {
 public:
-    ReSpeaker() {
-        console = 1;
-    }
+    ReSpeaker();
     
     /**
      * setup touch buttons, full color pixels and spi bridge

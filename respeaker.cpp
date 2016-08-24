@@ -6,6 +6,20 @@
 ReSpeaker respeaker;
 const uint8_t ReSpeaker::touch_pins[TOUCH_NUM] = {8, 9, 13, 10, 6, 2, 4, 3};
 
+
+ReSpeaker::ReSpeaker()
+{
+    console = 1;
+    
+    touch_handler = 0;
+    last_touch_detected = 0;
+    touch_threshold = TOUCH_DEFAULT_THRESHOLD;
+    
+    spi_raw_handler = 0;
+    spi_handler = 0;
+    spi_event = 0;
+    spi_buf_index = 0;
+}
     
 void ReSpeaker::begin(int touch, int pixels, int spi)
 {
@@ -14,16 +28,11 @@ void ReSpeaker::begin(int touch, int pixels, int spi)
     
     if (touch) {
         touch_data = new uint8_t[TOUCH_NUM];
-        last_touch_detected = 0;
-        touch_handler = 0;
-        touch_threshold = TOUCH_DEFAULT_THRESHOLD;
         
         for (uint8_t i = 0; i < TOUCH_NUM; i++) {
             pinMode(touch_pins[i], OUTPUT);
             digitalWrite(touch_pins[i], LOW);
         }
-    } else {
-        touch_data = 0;
     }
 
     if (pixels) {
@@ -34,9 +43,6 @@ void ReSpeaker::begin(int touch, int pixels, int spi)
     
     if (spi) {
         spi_buf = new uint8_t[SPI_BUF_SIZE];
-        spi_buf_index = 0;
-        spi_raw_handler = 0;
-        spi_event = 0;
         
         pinMode(MOSI, INPUT);
         pinMode(MISO, OUTPUT);

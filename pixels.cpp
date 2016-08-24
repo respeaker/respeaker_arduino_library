@@ -14,7 +14,7 @@
 Pixels::Pixels(uint16_t num_leds) 
 {
     leds_n = num_leds;
-    pixels = new uint8_t[leds_n];
+    pixels = new uint8_t[leds_n * 3];
     brightness = 1.0;
     clear();
 }
@@ -207,8 +207,8 @@ void Pixels::theater_chase_rainbow(uint8_t time)
 
 void Pixels::update() 
 {
-    if(!pixels) return;
-	while((uint32_t)(micros() - end_time) < 50);
+	if ((uint32_t)(micros() - end_time) < 50) { return; }
+    
 	noInterrupts();
 
 	volatile uint16_t i = leds_n * 3;
