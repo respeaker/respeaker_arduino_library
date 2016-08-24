@@ -29,12 +29,14 @@ void ReSpeaker::begin(int touch, int pixels, int spi)
     if (pixels) {
         pixels_ptr = new Pixels(PIXELS_NUM);
         pixels_ptr->begin(PIXELS_PIN);
+        pixels_ptr->update();
     }
     
     if (spi) {
         spi_buf = new uint8_t[SPI_BUF_SIZE];
         spi_buf_index = 0;
         spi_raw_handler = 0;
+        spi_event = 0;
         
         pinMode(MOSI, INPUT);
         pinMode(MISO, OUTPUT);
@@ -69,8 +71,7 @@ void ReSpeaker::handle_spi_data(uint8_t data)
     
     if ('\n' == data) {
         spi_buf[spi_buf_index] = '\0';
-        if (spi_handler) spi_handler(0, spi_buf, spi_buf_index);
-        spi_buf_index = 0;
+        spi_event = 1;
     } else {
         spi_buf[spi_buf_index] = data;
         spi_buf_index++;
@@ -122,9 +123,9 @@ uint16_t ReSpeaker::read_touch(uint8_t id)
     return count;
 }
 
-void serialEventRun()
+void ReSpeaker::_loop()
 {
-    if (respeaker.console) {
+    if (console) {
         while (Serial.available() && Serial1.availableForWrite()) {
             Serial1.write((char)Serial.read());
         }
@@ -134,14 +135,25 @@ void serialEventRun()
         }
     }
     
-    if (respeaker.touch_handler) {
+    if (touch_handler) {
         uint32_t current = millis();
-        if ((uint32_t)(current - respeaker.last_touch_detected) >= 50) {
-            respeaker.last_touch_detected = current;
+        if ((uint32_t)(current - last_touch_detected) >= 50) {
+            last_touch_detected = current;
             
-            respeaker.detect_touch();
+            detect_touch();
         }
     }
+    
+    if (spi_event && spi_handler) {
+        spi_handler(0, spi_buf, spi_buf_index);
+        spi_buf_index = 0;
+        spi_event = 0;
+    }
+}
+
+void serialEventRun()
+{
+    respeaker._loop();
 }
 
 // SPI Interrupt Service Routine

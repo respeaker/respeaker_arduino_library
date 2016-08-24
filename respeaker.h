@@ -8,7 +8,7 @@
 
 #define SPI_BUF_SIZE            64
 #define TOUCH_NUM               8
-#define TOUCH_DETECT_INTERVAL   50 // ms
+#define TOUCH_DETECT_INTERVAL   10 // ms
 #define TOUCH_DEFAULT_THRESHOLD 32
 #define PIXELS_NUM              12
 #define PIXELS_PIN              11
@@ -126,21 +126,29 @@ public:
         return *pixels_ptr;
     }
     
+    /**
+     * called by serialEventRun() repeatedly
+     */
+    void _loop();
+    
 public:
     void (*spi_raw_handler)(uint8_t data);
-    void (*touch_handler)(uint8_t id, uint8_t event);
-    uint32_t last_touch_detected;
-    uint8_t console;
+    void (*spi_handler)(uint8_t addr, uint8_t *data, uint8_t len);
     
 private:
     Pixels *pixels_ptr;
+    uint8_t *touch_data;
+    
+    static const uint8_t touch_pins[TOUCH_NUM];
+    uint16_t touch_threshold;
+    void (*touch_handler)(uint8_t id, uint8_t event);
+    uint32_t last_touch_detected;
+    
+    uint8_t spi_event;
     uint8_t spi_buf_index;
     uint8_t *spi_buf;
-    uint8_t *touch_data;
-    uint16_t touch_threshold;
-    static const uint8_t touch_pins[TOUCH_NUM];
     
-    void (*spi_handler)(uint8_t addr, uint8_t *data, uint8_t len);
+    uint8_t console;
 };
 
 extern ReSpeaker respeaker;
