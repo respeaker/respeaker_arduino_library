@@ -17,7 +17,7 @@ ReSpeaker::ReSpeaker()
     
     spi_raw_handler = 0;
     spi_handler = 0;
-    spi_event = 0;
+    spi_state = 0;
     spi_buf_index = 0;
 }
     
@@ -69,18 +69,59 @@ void ReSpeaker::exec(const char *cmd)
     Serial1.print('\n');
 }
 
+uint8_t crc8(const uint8_t *data, uint8_t len)
+{
+    uint16_t crc = 0x00;
+    while (len--) {
+        crc ^= (*data++ << 8);
+        for(uint8_t i = 8; i; i--) {
+            if (crc & 0x8000) {
+                crc ^= (0x1070 << 3);
+            }
+            crc <<= 1;
+        }
+    }
+    return (uint8_t)(crc >> 8);
+}
+
 void ReSpeaker::handle_spi_data(uint8_t data)
 {
-    if (spi_buf_index >= SPI_BUF_SIZE) {
-        spi_buf_index = 0;
-    }
-    
-    if ('\n' == data) {
-        spi_buf[spi_buf_index] = '\0';
-        spi_event = 1;
-    } else {
+    if (0 == spi_state) {
+        if (SPI_DATA_PREFIX == data) {
+            spi_state = 1;
+        }
+    } else if (1 == spi_state) {
+        spi_data_address = data;
+        spi_state = 2;
+    } else if (2 == spi_state) {
+        if (data <= SPI_BUF_SIZE) {
+            spi_data_length = data;
+            spi_buf_index = 0;
+            spi_state = 3;
+        } else {
+            spi_state = 0;
+        }
+    } else if (3 == spi_state) {
         spi_buf[spi_buf_index] = data;
         spi_buf_index++;
+         
+        if (spi_data_length <= spi_buf_index) {
+            spi_state = 4;
+        }
+    } else if (4 == spi_state) {
+        uint8_t crc = crc8(spi_buf, spi_data_length);
+        if (crc == data) {
+            spi_handler(spi_data_address, spi_buf, spi_data_length);
+        } else {
+            Serial.print("crc check failed:");
+            Serial.println(crc);
+            for (uint8_t i = 0; i < spi_data_length; i++) {
+                Serial.print(spi_buf[i]);
+                Serial.print(' ');
+            }
+            Serial.println(data);
+        }
+        spi_state = 0;
     }
 }
 
@@ -148,12 +189,6 @@ void ReSpeaker::_loop()
             
             detect_touch();
         }
-    }
-    
-    if (spi_event && spi_handler) {
-        spi_handler(0, spi_buf, spi_buf_index);
-        spi_buf_index = 0;
-        spi_event = 0;
     }
 }
 

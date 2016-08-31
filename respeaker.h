@@ -7,6 +7,7 @@
 #include "pixels.h"
 
 #define SPI_BUF_SIZE            64
+#define SPI_DATA_PREFIX		0xA5
 #define TOUCH_NUM               8
 #define TOUCH_DETECT_INTERVAL   10 // ms
 #define TOUCH_DEFAULT_THRESHOLD 32
@@ -142,7 +143,9 @@ private:
     void (*touch_handler)(uint8_t id, uint8_t event);
     uint32_t last_touch_detected;
     
-    uint8_t spi_event;
+    uint8_t spi_state;
+    uint8_t spi_data_address;
+    uint8_t spi_data_length;
     uint8_t spi_buf_index;
     uint8_t *spi_buf;
     

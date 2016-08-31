@@ -19,20 +19,37 @@ void touch_event(uint8_t id, uint8_t event) {
 
 void spi_event(uint8_t addr, uint8_t *data, uint8_t len)
 {
-  for (uint8_t i = 0; i < sizeof(pixels_patterns) / sizeof(*pixels_patterns); i++) {
-    if (!strcmp(pixels_patterns[i], (char *)data)) {
-      pixels_state = i;
-      break;
-    }
+  if (0 == addr) {
+    if (0 == data[0]) {
+      pixels->clear();
+      pixels->update();
+      pixels_state = -1;
+    } else if (1 == data[0]) {
+      for (int i = 0; i < PIXELS_NUM; i++) {
+        pixels->set_pixel(i, data[3], data[2], data[1]);
+      }
+      pixels->update();
+      pixels_state = -1;
+    } else if (2 == data[0]) {
+      for (int i = 0; i < PIXELS_NUM; i++) {
+        pixels->set_pixel(i, 0, 0xFF, 0);
+      }
+      pixels->update();
+      pixels_state = -1;
+    } else if (3 == data[0]) {
+      pixels_state = 2;
+    }  else if (4 == data[0]) {
+      pixels_state = 3;
+    } 
   }
 }
 
 void setup() {
   respeaker.begin();
-  respeaker.attach_touch_handler(touch_event);
-  respeaker.attach_spi_handler(spi_event);
 
   pixels = &respeaker.pixels();
+  respeaker.attach_touch_handler(touch_event);
+  respeaker.attach_spi_handler(spi_event);
   for (int i = 0; i < PIXELS_NUM; i++) {
     pixels->set_pixel(i, 0, 0, 32);
   }
