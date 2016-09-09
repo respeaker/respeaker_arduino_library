@@ -26,13 +26,13 @@ void spi_event(uint8_t addr, uint8_t *data, uint8_t len)
       pixels_state = -1;
     } else if (1 == data[0]) {
       for (int i = 0; i < PIXELS_NUM; i++) {
-        pixels->set_pixel(i, data[3], data[2], data[1]);
+        pixels->set_color(i, data[3], data[2], data[1]);
       }
       pixels->update();
       pixels_state = -1;
     } else if (2 == data[0]) {
       for (int i = 0; i < PIXELS_NUM; i++) {
-        pixels->set_pixel(i, 0, 0xFF, 0);
+        pixels->set_color(i, 0, 0xFF, 0);
       }
       pixels->update();
       pixels_state = -1;
@@ -51,7 +51,7 @@ void setup() {
   respeaker.attach_touch_handler(touch_event);
   respeaker.attach_spi_handler(spi_event);
   for (int i = 0; i < PIXELS_NUM; i++) {
-    pixels->set_pixel(i, 0, 0, 32);
+    pixels->set_color(i, 0, 0, 32);
   }
   pixels->update();
 
@@ -71,14 +71,14 @@ void loop() {
     pixels_state = -1;
   } else if (pixels_state == 1) {
     for (int i = 0; i < PIXELS_NUM; i++) {
-      pixels->set_pixel(i, 0, 0xFF, 0);
+      pixels->set_color(i, 0, 0xFF, 0);
     }
     pixels->update();
     pixels_state = -1;
   } else if (pixels_state == 2) {
     static uint32_t t = 0;
     for (int i = 0; i < PIXELS_NUM; i++) {
-      pixels->set_pixel(i, triangular_color((t + i * PIXELS_SPACE) % (PIXELS_SPACE * PIXELS_NUM)));
+      pixels->set_color(i, triangular_color((t + i * PIXELS_SPACE) % (PIXELS_SPACE * PIXELS_NUM)));
     }
     pixels->update();
 
@@ -99,7 +99,7 @@ void loop() {
         if (c < 0) {
           c = 0;
         }
-        pixels->set_pixel(i, 0, c, 0);
+        pixels->set_color(i, 0, c, 0);
       }
       pixels->update();
 
@@ -110,7 +110,7 @@ void loop() {
     }
   } else if (pixels_state == 4) {
     for (int i = 0; i < PIXELS_NUM; i++) {
-      pixels->set_pixel(i, 0xFF, 0, 0);
+      pixels->set_color(i, 0xFF, 0, 0);
     }
     pixels->update();
     pixels_state = -1;
@@ -119,7 +119,7 @@ void loop() {
 
     if (!on) {
       for (int i = 0; i < PIXELS_NUM; i++) {
-        pixels->set_pixel(i, 0, 0xFF, 0);
+        pixels->set_color(i, 0, 0xFF, 0);
       }
       pixels->update();
       on = 1;
@@ -128,7 +128,7 @@ void loop() {
       uint32_t current = millis();
       if ((uint32_t)(current - last_time) >= 1000) {
         for (int i = 0; i < PIXELS_NUM; i++) {
-          pixels->set_pixel(i, 0, 0, 0);
+          pixels->set_color(i, 0, 0, 0);
         }
         pixels->update();
 

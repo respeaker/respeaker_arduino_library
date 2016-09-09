@@ -25,8 +25,8 @@ attach_touch_handler	KEYWORD2
 attach_spi_handler		KEYWORD2
 attach_spi_raw_handler	KEYWORD2
 
-set_pixel	KEYWORD2
-get_pixel	KEYWORD2
+set_color	KEYWORD2
+get_color	KEYWORD2
 set_brightness	KEYWORD2
 get_brightness	KEYWORD2
 clear	KEYWORD2
@@ -44,4 +44,3 @@ respeaker	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
-

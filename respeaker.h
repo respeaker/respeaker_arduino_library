@@ -9,7 +9,7 @@
 #define SPI_BUF_SIZE            64
 #define SPI_DATA_PREFIX		0xA5
 #define TOUCH_NUM               8
-#define TOUCH_DETECT_INTERVAL   10 // ms
+#define TOUCH_DETECT_INTERVAL   4 // ms
 #define TOUCH_DEFAULT_THRESHOLD 32
 #define PIXELS_NUM              12
 #define PIXELS_PIN              11

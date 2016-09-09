@@ -19,7 +19,7 @@ void setup() {
 
 void loop() {
   for (int i = 0; i < PIXELS_NUM; i++) {
-    respeaker.pixels().set_pixel(i, triangular_color((t + i * PIXELS_SPACE) % (PIXELS_SPACE * PIXELS_NUM)));
+    respeaker.pixels().set_color(i, triangular_color((t + i * PIXELS_SPACE) % (PIXELS_SPACE * PIXELS_NUM)));
   }
   respeaker.pixels().update();
 

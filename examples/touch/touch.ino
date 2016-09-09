@@ -18,9 +18,9 @@ void loop() {}
 // id: 0 ~ 7 - touch sensor id; event: 1 - touch, 0 - release
 void touch_event(uint8_t id, uint8_t event) {
   if (event) {
-    respeaker.pixels().set_pixel(id, Pixels::wheel(id * 32));
+    respeaker.pixels().set_color(id, Pixels::wheel(id * 32));
   } else {
-    respeaker.pixels().set_pixel(id, 0);
+    respeaker.pixels().set_color(id, 0);
   }
   respeaker.pixels().update();
 }
