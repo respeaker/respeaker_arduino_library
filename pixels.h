@@ -20,6 +20,16 @@
 #include <stdint.h>
 #include <Arduino.h>
 
+typedef union {
+    struct {
+        uint8_t b;
+        uint8_t g;
+        uint8_t r;
+        uint8_t a;
+    };
+    uint32_t c;
+} color_t;
+
 class Pixels {
 public:
     Pixels(uint16_t num_leds);
