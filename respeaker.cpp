@@ -4,8 +4,10 @@
 
 
 ReSpeaker respeaker;
-const uint8_t ReSpeaker::touch_pins[TOUCH_NUM] = {8, 9, 13, 10, 6, 2, 4, 3};
 
+// disorganize touch pins order to reduce interference {8, 9, 13, 10, 6, 2, 4, 3}
+const uint8_t ReSpeaker::touch_pins[TOUCH_NUM] = {9, 2, 10, 3, 8, 6, 13, 4};
+const uint8_t ReSpeaker::touch_pins_id[TOUCH_NUM] = {1, 5, 3, 7, 0, 4, 2, 6};
 
 ReSpeaker::ReSpeaker()
 {
@@ -145,10 +147,10 @@ uint16_t ReSpeaker::detect_touch()
 
         if (0x01 == touch_data[i]) {
             status |= 1 << i;
-            if (touch_handler) touch_handler(i, 1);
+            if (touch_handler) touch_handler(touch_pins_id[i], 1);
         } else if (0x80 == touch_data[i]) {
             status &= ~(1 << i);
-            if (touch_handler) touch_handler(i, 0);
+            if (touch_handler) touch_handler(touch_pins_id[i], 0);
         }
     }
     
@@ -158,14 +160,21 @@ uint16_t ReSpeaker::detect_touch()
 uint16_t ReSpeaker::read_touch(uint8_t id)
 {
     uint16_t count;
+    uint8_t index = 0;
+    for (uint8_t i=0; i<TOUCH_NUM; i++) {
+        if (id == touch_pins_id[i]) {
+            index = i;
+            break;
+        }
+    }
 
-    pinMode(touch_pins[id], INPUT);
-    while (!digitalRead(touch_pins[id])) {
+    pinMode(touch_pins[index], INPUT);
+    while (!digitalRead(touch_pins[index])) {
         count++;
     }
 
-    pinMode(touch_pins[id], OUTPUT);
-    digitalWrite(touch_pins[id], LOW);
+    pinMode(touch_pins[index], OUTPUT);
+    digitalWrite(touch_pins[index], LOW);
     
     return count;
 }
