@@ -11,6 +11,8 @@
 Pixels *pixels;
 volatile uint32_t color;
 volatile int pixels_state = 0;
+volatile uint8_t volume = 0;
+volatile uint32_t volume_changed_time = 0;
 
 void touch_event(uint8_t id, uint8_t event) {
   // id - touch sensor id (0 ~ 7), event - 1: touch, 0: release
@@ -32,6 +34,10 @@ void spi_event(uint8_t addr, uint8_t *data, uint8_t len)
       pixels_state = 1;
     }  else if (4 == data[0]) {   // speaking mode
       pixels_state = 2;
+    } else if (5 == data[0]) {    // volume mode
+      pixels_state = 3;
+      volume = data[3];
+      volume_changed_time = 0;
     }
   } else if (0xA0 == addr) {       // spectrum data
     pixels_state = -1;
@@ -103,6 +109,25 @@ void loop() {
       if (t <= 0x40 || t >= 0xF0) {
         deta = -deta;
       }
+    }
+  } else if (pixels_state == 3) {
+    if (0 == volume_changed_time) {
+      uint8_t position = volume / 8;
+      Serial.print("volume:");
+      Serial.println(volume);
+      for (int i = 0; i < PIXELS_NUM; i++) {
+        uint8_t c = 0;
+        if (i < position) {
+          c = 0x20;
+        }
+        pixels->set_color(i, 0, c, 0);
+      }
+      pixels->update();
+      volume_changed_time = millis();
+    } else if ((uint32_t)(millis() - volume_changed_time) > 3000) {
+      pixels_state = -1;
+      pixels->clear();
+      pixels->update();
     }
   }
 }
