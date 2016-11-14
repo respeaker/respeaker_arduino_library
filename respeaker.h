@@ -139,6 +139,7 @@ private:
     uint8_t *touch_data;
     
     static const uint8_t touch_pins[TOUCH_NUM];
+    static const uint8_t touch_pins_id[TOUCH_NUM];
     uint16_t touch_threshold;
     void (*touch_handler)(uint8_t id, uint8_t event);
     uint32_t last_touch_detected;
