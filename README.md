@@ -1,7 +1,7 @@
 ReSpeaker Arduino Library
 =========================
 
-
+[![Build Status](https://travis-ci.org/respeaker/respeaker_arduino_library.svg?branch=master)](https://travis-ci.org/respeaker/respeaker_arduino_library)
 
 ### Features
 + supported capacitive touch sensing
