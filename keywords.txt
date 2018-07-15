@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 ReSpeaker	KEYWORD1
-Pixels		KEYWORD1
+Pixels	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -16,13 +16,13 @@ begin	KEYWORD2
 play	KEYWORD2
 exec	KEYWORD2
 pixels	KEYWORD2
-set_console		KEYWORD2
+set_console	KEYWORD2
 calibrate_touch	KEYWORD2
-read_touch		KEYWORD2
+read_touch	KEYWORD2
 detect_touch	KEYWORD2
-set_touch_threshold		KEYWORD2
+set_touch_threshold	KEYWORD2
 attach_touch_handler	KEYWORD2
-attach_spi_handler		KEYWORD2
+attach_spi_handler	KEYWORD2
 attach_spi_raw_handler	KEYWORD2
 
 set_color	KEYWORD2
@@ -32,7 +32,7 @@ get_brightness	KEYWORD2
 clear	KEYWORD2
 update	KEYWORD2
 number	KEYWORD2
-RGB		KEYWORD2
+RGB	KEYWORD2
 rainbow	KEYWORD2
 wheel	KEYWORD2
 
